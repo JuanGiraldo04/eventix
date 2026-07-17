@@ -6,7 +6,7 @@ App Flutter de gestión de eventos deportivos: autenticación, listado de evento
 
 ## Demo
 
-(https://www.loom.com/share/32bd9b71ec7d4f489238c8efd9cdb83d)
+https://www.loom.com/share/32bd9b71ec7d4f489238c8efd9cdb83d
 
 ---
 
