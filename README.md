@@ -171,14 +171,29 @@ La UI nunca ve una excepción cruda: `.when(loading:, error:, data:)` en cada pa
 
 ---
 
+## Environment setup
+
+This project uses [envied](https://pub.dev/packages/envied) to handle environment variables securely. The Supabase URL and key are obfuscated at compile time and never exposed in the binary.
+
+1. Create a `.env` file in the root of the project:
+
+```
+cp .env.example .env
+```
+
+2. Add your Supabase project credentials to `.env`:
+
+```
+SUPABASE_URL=your_supabase_project_url_here
+SUPABASE_PUBLISHABLE_KEY=your_supabase_publishable_key_here
+
+```
+
+---
+
 ## Cómo correr el proyecto
 
-1. Crea un archivo `.env` en la raíz con:
-
-```
-SUPABASE_URL=<tu-project-url>
-SUPABASE_PUBLISHABLE_KEY=<tu-publishable-key>
-```
+1. Sigue el [Environment setup](#environment-setup) de arriba.
 
 2. Instala dependencias y genera el código:
 
