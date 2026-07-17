@@ -1,0 +1,40 @@
+name: eventix
+description: "A new Flutter project."
+publish_to: 'none'
+version: 0.0.1
+
+environment:
+  sdk: ^3.12.0
+
+dependencies:
+  dio: ^5.9.2
+  envied: ^1.3.5
+  flutter:
+    sdk: flutter
+  flutter_localizations:
+    sdk: flutter
+  flutter_riverpod: ^3.3.1
+  riverpod_annotation: ^4.0.3
+  go_router: ^17.3.0
+  intl: ^0.20.2
+  supabase_flutter: ^2.16.0
+  app_ui_kit:
+    git: https://github.com/JuanGiraldo04/app-ui-kit.git
+
+dev_dependencies:
+  envied_generator: ^1.3.5
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+  mocktail: ^1.0.5
+  riverpod_generator: ^4.0.3
+  build_runner: ^2.15.0
+
+flutter:
+  generate: true
+  uses-material-design: true
+
+flutter_intl:
+  enabled: true
+  class_name: S
+  main_locale: en

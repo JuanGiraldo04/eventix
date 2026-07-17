@@ -1,0 +1,38 @@
+import 'package:app_ui_kit/app_ui_kit.dart';
+import 'package:eventix/core/env/env.dart';
+import 'package:eventix/core/l10n/app_localizations.dart';
+import 'package:eventix/core/router/app_router.dart';
+import 'package:eventix/core/theme/theme_provider.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Supabase.initialize(
+    url: Env.supabaseUrl,
+    publishableKey: Env.supabasePublishableKey,
+  );
+  runApp(const ProviderScope(child: MainApp()));
+}
+
+class MainApp extends ConsumerWidget {
+  const MainApp({super.key});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final ThemeMode themeMode = ref.watch(themeModeProvider);
+
+    return MaterialApp.router(
+      debugShowCheckedModeBanner: false,
+      localizationsDelegates: AppLocalizations.localizationsDelegates,
+      supportedLocales: AppLocalizations.supportedLocales,
+      onGenerateTitle: (BuildContext context) =>
+          AppLocalizations.of(context).app_name,
+      theme: AppTheme.light(),
+      darkTheme: AppTheme.dark(),
+      themeMode: themeMode,
+      routerConfig: appRouter,
+    );
+  }
+}
