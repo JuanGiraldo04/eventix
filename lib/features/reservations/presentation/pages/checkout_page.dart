@@ -139,17 +139,12 @@ class _CheckoutBody extends ConsumerWidget {
                     ],
                   ),
                 ),
-                const SizedBox(height: AppSpacing.xl),
-                Text(
-                  l10n.checkout_quantity_label,
-                  style: AppTypography.titleSmall,
-                ),
                 const SizedBox(height: AppSpacing.sm),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: <Widget>[
                     Text(
-                      l10n.checkout_quantity_row_label,
+                      l10n.checkout_quantity_label,
                       style: AppTypography.bodyMedium,
                     ),
                     Row(
