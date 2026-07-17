@@ -57,9 +57,6 @@ class AppLocalizationsEs extends AppLocalizations {
   String get register_go_login => 'Inicia sesión';
 
   @override
-  String get events_title => 'Eventos';
-
-  @override
   String get events_greeting => 'Hola,';
 
   @override

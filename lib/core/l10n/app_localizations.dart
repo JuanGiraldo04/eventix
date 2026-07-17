@@ -194,12 +194,6 @@ abstract class AppLocalizations {
   /// **'Sign in'**
   String get register_go_login;
 
-  /// No description provided for @events_title.
-  ///
-  /// In en, this message translates to:
-  /// **'Events'**
-  String get events_title;
-
   /// No description provided for @events_greeting.
   ///
   /// In en, this message translates to:

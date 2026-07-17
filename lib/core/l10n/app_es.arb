@@ -15,7 +15,6 @@
     "register_submit": "Crear cuenta",
     "register_have_account_prompt": "¿Ya tienes cuenta?",
     "register_go_login": "Inicia sesión",
-    "events_title": "Eventos",
     "events_greeting": "Hola,",
     "events_search_hint": "Buscar eventos...",
     "events_filter_category_all": "Todos",

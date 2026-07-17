@@ -57,9 +57,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get register_go_login => 'Sign in';
 
   @override
-  String get events_title => 'Events';
-
-  @override
   String get events_greeting => 'Hi,';
 
   @override

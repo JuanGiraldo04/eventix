@@ -15,7 +15,6 @@
     "register_submit": "Sign up",
     "register_have_account_prompt": "Already have an account?",
     "register_go_login": "Sign in",
-    "events_title": "Events",
     "events_greeting": "Hi,",
     "events_search_hint": "Search events...",
     "events_filter_category_all": "All",
