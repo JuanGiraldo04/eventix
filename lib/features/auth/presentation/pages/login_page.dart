@@ -1,0 +1,157 @@
+import 'package:app_ui_kit/app_ui_kit.dart';
+import 'package:eventix/core/errors/failure.dart';
+import 'package:eventix/core/extensions/theme_extension.dart';
+import 'package:eventix/core/l10n/app_localizations.dart';
+import 'package:eventix/features/auth/domain/entities/app_user.dart';
+import 'package:eventix/features/auth/presentation/pages/register_page.dart';
+import 'package:eventix/features/auth/presentation/providers/login_provider.dart';
+import 'package:eventix/features/auth/presentation/widgets/eventix_logo.dart';
+import 'package:eventix/features/events/presentation/pages/events_page.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+
+class LoginPage extends ConsumerWidget {
+  static const String routePath = '/login';
+
+  const LoginPage({super.key});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final AsyncValue<AppUser?> asyncUser = ref.watch(loginProvider);
+    final AppLocalizations l10n = AppLocalizations.of(context);
+
+    ref.listen(loginProvider, (
+      AsyncValue<AppUser?>? previous,
+      AsyncValue<AppUser?> next,
+    ) {
+      final AppUser? user = next.value;
+      if (user != null) context.go(EventsPage.routePath);
+    });
+
+    return Scaffold(
+      body: SafeArea(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(AppSpacing.xl),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: <Widget>[
+              const Center(child: EventixLogo()),
+              const SizedBox(height: AppSpacing.lg),
+              Text(
+                l10n.app_name,
+                textAlign: TextAlign.center,
+                style: AppTypography.headlineMedium,
+              ),
+              const SizedBox(height: AppSpacing.xs),
+              Text(
+                l10n.login_tagline,
+                textAlign: TextAlign.center,
+                style: AppTypography.bodyMedium.copyWith(
+                  color: context.colorScheme.onSurfaceVariant,
+                ),
+              ),
+              const SizedBox(height: AppSpacing.xxl),
+              if (asyncUser.hasError) ...<Widget>[
+                AppBanner(
+                  variant: AppBannerVariant.error,
+                  title: l10n.login_title,
+                  message: switch (asyncUser.error) {
+                    Failure(:final String userMessage) => userMessage,
+                    _ => l10n.common_unexpected_error,
+                  },
+                ),
+                const SizedBox(height: AppSpacing.lg),
+              ],
+              _LoginForm(
+                isLoading: asyncUser.isLoading,
+                onSubmit: (String email, String password) => ref
+                    .read(loginProvider.notifier)
+                    .login(email: email, password: password),
+              ),
+              const SizedBox(height: AppSpacing.xl),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  Text(
+                    l10n.login_no_account_prompt,
+                    style: AppTypography.bodyMedium,
+                  ),
+                  TextButton(
+                    onPressed: () => context.go(RegisterPage.routePath),
+                    child: Text(l10n.login_go_register),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _LoginForm extends StatefulWidget {
+  const _LoginForm({required this.isLoading, required this.onSubmit});
+
+  final bool isLoading;
+  final void Function(String email, String password) onSubmit;
+
+  @override
+  State<_LoginForm> createState() => _LoginFormState();
+}
+
+class _LoginFormState extends State<_LoginForm> {
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+  bool _obscurePassword = true;
+
+  @override
+  void dispose() {
+    _emailController.dispose();
+    _passwordController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final AppLocalizations l10n = AppLocalizations.of(context);
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: <Widget>[
+        AppTextField(
+          label: l10n.login_email_label,
+          hint: l10n.login_email_hint,
+          leading: const Icon(Icons.email_outlined),
+          controller: _emailController,
+          keyboardType: TextInputType.emailAddress,
+        ),
+        const SizedBox(height: AppSpacing.md),
+        AppTextField(
+          label: l10n.login_password_label,
+          leading: const Icon(Icons.lock_outline),
+          trailing: IconButton(
+            icon: Icon(
+              _obscurePassword ? Icons.visibility_off : Icons.visibility,
+            ),
+            onPressed: () =>
+                setState(() => _obscurePassword = !_obscurePassword),
+          ),
+          obscureText: _obscurePassword,
+          controller: _passwordController,
+        ),
+        const SizedBox(height: AppSpacing.xl),
+        AppButton(
+          label: l10n.login_submit,
+          isLoading: widget.isLoading,
+          isFullWidth: true,
+          onPressed: () => widget.onSubmit(
+            _emailController.text.trim(),
+            _passwordController.text,
+          ),
+        ),
+      ],
+    );
+  }
+}
