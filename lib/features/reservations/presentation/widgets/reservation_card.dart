@@ -1,5 +1,4 @@
 import 'package:app_ui_kit/app_ui_kit.dart';
-import 'package:eventix/core/extensions/theme_extension.dart';
 import 'package:eventix/core/l10n/app_localizations.dart';
 import 'package:eventix/features/events/presentation/utils/event_formatters.dart';
 import 'package:eventix/features/reservations/domain/entities/reservation_summary.dart';
@@ -22,33 +21,15 @@ class ReservationCard extends StatelessWidget {
 
     return AppListItemCard(
       imageUrl: reservation.eventoImagenUrl,
-      onTap: onTap,
+      title: reservation.eventoTitulo,
+      titleMaxLines: 1,
+      subtitleLines: <String>[formatEventFecha(reservation.eventoFecha)],
+      detailLine:
+          '${reservation.cantidadEntradas} '
+          '${l10n.reservations_entradas_suffix} · '
+          '${formatEventPrecio(reservation.total)}',
       trailing: ReservationStatusBadge(estado: reservation.estado),
-      content: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: <Widget>[
-          Text(
-            reservation.eventoTitulo,
-            style: AppTypography.titleSmall,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-          ),
-          const SizedBox(height: AppSpacing.xs),
-          Text(
-            formatEventFecha(reservation.eventoFecha),
-            style: AppTypography.bodySmall.copyWith(
-              color: context.colorScheme.onSurfaceVariant,
-            ),
-          ),
-          const SizedBox(height: AppSpacing.xs),
-          Text(
-            '${reservation.cantidadEntradas} '
-            '${l10n.reservations_entradas_suffix} · '
-            '${formatEventPrecio(reservation.total)}',
-            style: AppTypography.bodySmall,
-          ),
-        ],
-      ),
+      onTap: onTap,
     );
   }
 }

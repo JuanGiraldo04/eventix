@@ -1,6 +1,5 @@
 import 'package:app_ui_kit/app_ui_kit.dart';
 import 'package:eventix/core/errors/failure.dart';
-import 'package:eventix/core/extensions/theme_extension.dart';
 import 'package:eventix/core/l10n/app_localizations.dart';
 import 'package:eventix/features/events/presentation/utils/event_formatters.dart';
 import 'package:eventix/features/reservations/domain/entities/reservation.dart';
@@ -89,56 +88,31 @@ class _CheckoutBody extends ConsumerWidget {
               children: <Widget>[
                 AppListItemCard(
                   imageUrl: data.event.imagenUrl,
-                  content: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: <Widget>[
-                      Text(
-                        data.event.titulo,
-                        style: AppTypography.titleSmall,
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                      const SizedBox(height: AppSpacing.xs),
-                      Text(
-                        '${formatEventFecha(data.event.fecha)} · '
+                  title: data.event.titulo,
+                  titleMaxLines: 2,
+                  subtitleLines: <String>[
+                    '${formatEventFecha(data.event.fecha)} · '
                         '${data.event.hora}',
-                        style: AppTypography.bodySmall.copyWith(
-                          color: context.colorScheme.onSurfaceVariant,
-                        ),
-                      ),
-                    ],
-                  ),
+                  ],
                 ),
                 const SizedBox(height: AppSpacing.sm),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: <Widget>[
-                    Text(
-                      l10n.checkout_quantity_label,
-                      style: AppTypography.bodyMedium,
-                    ),
-                    AppStepper(
-                      value: quantity,
-                      onDecrement: quantity > 1
-                          ? () => ref
-                                .read(
-                                  checkoutQuantityProvider(
-                                    reservationId,
-                                  ).notifier,
-                                )
-                                .decrement()
-                          : null,
-                      onIncrement: quantity < maxQuantity
-                          ? () => ref
-                                .read(
-                                  checkoutQuantityProvider(
-                                    reservationId,
-                                  ).notifier,
-                                )
-                                .increment(maxQuantity)
-                          : null,
-                    ),
-                  ],
+                AppStepper(
+                  label: l10n.checkout_quantity_label,
+                  value: quantity,
+                  onDecrement: quantity > 1
+                      ? () => ref
+                            .read(
+                              checkoutQuantityProvider(reservationId).notifier,
+                            )
+                            .decrement()
+                      : null,
+                  onIncrement: quantity < maxQuantity
+                      ? () => ref
+                            .read(
+                              checkoutQuantityProvider(reservationId).notifier,
+                            )
+                            .increment(maxQuantity)
+                      : null,
                 ),
                 const SizedBox(height: AppSpacing.md),
                 AppKeyValueRow(
@@ -158,38 +132,22 @@ class _CheckoutBody extends ConsumerWidget {
             ),
           ),
         ),
-        SafeArea(
-          child: Padding(
-            padding: const EdgeInsets.all(AppSpacing.lg),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: <Widget>[
-                if (asyncConfirm.hasError) ...<Widget>[
-                  AppBanner(
-                    variant: AppBannerVariant.error,
-                    message: switch (asyncConfirm.error) {
-                      Failure(:final String userMessage) => userMessage,
-                      _ => l10n.common_unexpected_error,
-                    },
-                  ),
-                  const SizedBox(height: AppSpacing.md),
-                ],
-                AppButton(
-                  label: l10n.checkout_confirm,
-                  isFullWidth: true,
-                  isLoading: asyncConfirm.isLoading,
-                  onPressed: () => ref
-                      .read(confirmPurchaseProvider.notifier)
-                      .confirmPurchase(
-                        reservationId: reservationId,
-                        cantidadEntradas: quantity,
-                        total: total,
-                      ),
-                ),
-              ],
-            ),
-          ),
+        AppBottomActionBar(
+          buttonLabel: l10n.checkout_confirm,
+          isLoading: asyncConfirm.isLoading,
+          errorMessage: asyncConfirm.hasError
+              ? switch (asyncConfirm.error) {
+                  Failure(:final String userMessage) => userMessage,
+                  _ => l10n.common_unexpected_error,
+                }
+              : null,
+          onPressed: () => ref
+              .read(confirmPurchaseProvider.notifier)
+              .confirmPurchase(
+                reservationId: reservationId,
+                cantidadEntradas: quantity,
+                total: total,
+              ),
         ),
       ],
     );

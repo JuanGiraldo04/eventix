@@ -1,6 +1,5 @@
 import 'package:app_ui_kit/app_ui_kit.dart';
 import 'package:eventix/core/errors/failure.dart';
-import 'package:eventix/core/extensions/theme_extension.dart';
 import 'package:eventix/core/l10n/app_localizations.dart';
 import 'package:eventix/features/auth/domain/entities/app_user.dart';
 import 'package:eventix/features/auth/presentation/providers/current_user_provider.dart';
@@ -26,37 +25,16 @@ class ProfilePage extends ConsumerWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: <Widget>[
-            AppCard(
-              child: Row(
-                children: <Widget>[
-                  const AppAvatar(radius: 24),
-                  const SizedBox(width: AppSpacing.md),
-                  Expanded(
-                    child: asyncUser.when(
-                      loading: () => const AppLoader(),
-                      error: (Object error, _) => Text(
-                        switch (error) {
-                          Failure(:final String userMessage) => userMessage,
-                          _ => l10n.common_unexpected_error,
-                        },
-                        style: AppTypography.bodyMedium,
-                      ),
-                      data: (AppUser user) => Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: <Widget>[
-                          Text(user.nombre, style: AppTypography.titleMedium),
-                          Text(
-                            user.email,
-                            style: AppTypography.bodySmall.copyWith(
-                              color: context.colorScheme.onSurfaceVariant,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ],
-              ),
+            AppProfileHeaderCard(
+              isLoading: asyncUser.isLoading && !asyncUser.hasValue,
+              errorMessage: asyncUser.hasError && !asyncUser.hasValue
+                  ? switch (asyncUser.error) {
+                      Failure(:final String userMessage) => userMessage,
+                      _ => l10n.common_unexpected_error,
+                    }
+                  : null,
+              name: asyncUser.value?.nombre,
+              email: asyncUser.value?.email,
             ),
             const SizedBox(height: AppSpacing.xl),
             if (asyncLogout.hasError)

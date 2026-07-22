@@ -1,6 +1,5 @@
 import 'package:app_ui_kit/app_ui_kit.dart';
 import 'package:eventix/core/errors/failure.dart';
-import 'package:eventix/core/extensions/theme_extension.dart';
 import 'package:eventix/core/l10n/app_localizations.dart';
 import 'package:eventix/features/auth/presentation/providers/current_user_provider.dart';
 import 'package:eventix/features/events/domain/entities/event.dart';
@@ -86,61 +85,12 @@ class _EventsHeader extends ConsumerWidget {
     final AppLocalizations l10n = AppLocalizations.of(context);
     final String? nombre = ref.watch(currentUserProvider).value?.nombre;
 
-    return ColoredBox(
-      color: context.colorScheme.secondary,
-      child: SafeArea(
-        bottom: false,
-        child: Theme(
-          data: AppTheme.dark(),
-          child: Builder(
-            builder: (BuildContext context) => Padding(
-              padding: const EdgeInsets.fromLTRB(
-                AppSpacing.lg,
-                AppSpacing.md,
-                AppSpacing.lg,
-                AppSpacing.xl,
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: <Widget>[
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: <Widget>[
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: <Widget>[
-                          Text(
-                            '${l10n.events_greeting} ${nombre ?? ''} 👋',
-                            style: AppTypography.bodyMedium.copyWith(
-                              color: context.colorScheme.onSurfaceVariant,
-                            ),
-                          ),
-                          Text(
-                            l10n.app_name,
-                            style: AppTypography.headlineSmall.copyWith(
-                              color: context.colorScheme.onSurface,
-                            ),
-                          ),
-                        ],
-                      ),
-                      GestureDetector(
-                        onTap: () => context.go(ProfilePage.routePath),
-                        child: const AppAvatar(),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: AppSpacing.lg),
-                  AppTextField(
-                    hint: l10n.events_search_hint,
-                    leading: const Icon(Icons.search),
-                    onChanged: ref.read(eventFilterProvider.notifier).setQuery,
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ),
-      ),
+    return AppHomeHeader(
+      greeting: '${l10n.events_greeting} ${nombre ?? ''} 👋',
+      title: l10n.app_name,
+      onAvatarTap: () => context.go(ProfilePage.routePath),
+      searchHint: l10n.events_search_hint,
+      onSearchChanged: ref.read(eventFilterProvider.notifier).setQuery,
     );
   }
 }

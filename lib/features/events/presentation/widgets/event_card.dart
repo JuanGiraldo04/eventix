@@ -1,5 +1,4 @@
 import 'package:app_ui_kit/app_ui_kit.dart';
-import 'package:eventix/core/extensions/theme_extension.dart';
 import 'package:eventix/core/l10n/app_localizations.dart';
 import 'package:eventix/features/events/domain/entities/event.dart';
 import 'package:eventix/features/events/presentation/utils/event_formatters.dart';
@@ -14,76 +13,29 @@ class EventCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final AppLocalizations l10n = AppLocalizations.of(context);
-    final AppStatusBadgeVariant cuposVariant = eventCuposVariant(
-      event.cuposDisponibles,
-      event.capacidad,
-    );
 
-    return AppMediaCard(
+    return AppEventCard(
       imageUrl: event.imagenUrl,
-      onTap: onTap,
-      overlay: AppChip(label: event.categoria, isSelected: true),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: <Widget>[
-          Text(
-            event.titulo,
-            style: AppTypography.titleSmall,
-            maxLines: 2,
-            overflow: TextOverflow.ellipsis,
-          ),
-          const SizedBox(height: AppSpacing.xs),
-          Row(
-            children: <Widget>[
-              Icon(
-                Icons.location_on_outlined,
-                size: 14,
-                color: context.colorScheme.onSurfaceVariant,
-              ),
-              const SizedBox(width: 4),
-              Expanded(
-                child: Text(
-                  event.ciudad,
-                  style: AppTypography.bodySmall.copyWith(
-                    color: context.colorScheme.onSurfaceVariant,
-                  ),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ),
-              const SizedBox(width: AppSpacing.sm),
-              Icon(
-                Icons.calendar_today_outlined,
-                size: 14,
-                color: context.colorScheme.onSurfaceVariant,
-              ),
-              const SizedBox(width: 4),
-              Text(
-                formatEventFecha(event.fecha),
-                style: AppTypography.bodySmall.copyWith(
-                  color: context.colorScheme.onSurfaceVariant,
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: AppSpacing.sm),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: <Widget>[
-              Text(
-                formatEventPrecio(event.precio),
-                style: AppTypography.titleMedium.copyWith(
-                  color: context.colorScheme.primary,
-                ),
-              ),
-              AppStatusBadge(
-                label: '${event.cuposDisponibles} ${l10n.events_spots_suffix}',
-                variant: cuposVariant,
-              ),
-            ],
-          ),
-        ],
+      categoryLabel: event.categoria,
+      title: event.titulo,
+      metaItems: <AppMetaItem>[
+        AppMetaItem(
+          icon: Icons.location_on_outlined,
+          label: event.ciudad,
+          expanded: true,
+        ),
+        AppMetaItem(
+          icon: Icons.calendar_today_outlined,
+          label: formatEventFecha(event.fecha),
+        ),
+      ],
+      priceLabel: formatEventPrecio(event.precio),
+      spotsLabel: '${event.cuposDisponibles} ${l10n.events_spots_suffix}',
+      spotsVariant: eventCuposVariant(
+        event.cuposDisponibles,
+        event.capacidad,
       ),
+      onTap: onTap,
     );
   }
 }

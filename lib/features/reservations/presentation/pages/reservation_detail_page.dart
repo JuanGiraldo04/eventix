@@ -1,6 +1,5 @@
 import 'package:app_ui_kit/app_ui_kit.dart';
 import 'package:eventix/core/errors/failure.dart';
-import 'package:eventix/core/extensions/theme_extension.dart';
 import 'package:eventix/core/l10n/app_localizations.dart';
 import 'package:eventix/features/events/presentation/utils/event_formatters.dart';
 import 'package:eventix/features/reservations/domain/entities/reservation_detail.dart';
@@ -44,30 +43,13 @@ class ReservationDetailPage extends ConsumerWidget {
               AppListItemCard(
                 imageUrl: detail.eventoImagenUrl,
                 imageSize: 64,
-                trailing: ReservationStatusBadge(estado: detail.estado),
-                content: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: <Widget>[
-                    Text(
-                      detail.eventoTitulo,
-                      style: AppTypography.titleMedium,
-                    ),
-                    const SizedBox(height: AppSpacing.xs),
-                    Text(
-                      '${formatEventFecha(detail.eventoFecha)} · '
+                title: detail.eventoTitulo,
+                subtitleLines: <String>[
+                  '${formatEventFecha(detail.eventoFecha)} · '
                       '${detail.eventoHora}',
-                      style: AppTypography.bodySmall.copyWith(
-                        color: context.colorScheme.onSurfaceVariant,
-                      ),
-                    ),
-                    Text(
-                      detail.eventoCiudad,
-                      style: AppTypography.bodySmall.copyWith(
-                        color: context.colorScheme.onSurfaceVariant,
-                      ),
-                    ),
-                  ],
-                ),
+                  detail.eventoCiudad,
+                ],
+                trailing: ReservationStatusBadge(estado: detail.estado),
               ),
               const SizedBox(height: AppSpacing.lg),
               AppCard(
