@@ -95,7 +95,7 @@ class _EventDetailScaffold extends ConsumerWidget {
                 Positioned(
                   top: MediaQuery.paddingOf(context).top + AppSpacing.sm,
                   left: AppSpacing.lg,
-                  child: _CircleIconButton(
+                  child: AppCircleIconButton(
                     icon: Icons.arrow_back,
                     onTap: () => context.pop(),
                   ),
@@ -147,42 +147,15 @@ class _EventDetailScaffold extends ConsumerWidget {
                     ],
                   ),
                   const SizedBox(height: AppSpacing.lg),
-                  AppCard(
-                    variant: AppCardVariant.filled,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: <Widget>[
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: <Widget>[
-                            Text(
-                              l10n.event_detail_available_spots,
-                              style: AppTypography.bodyMedium,
-                            ),
-                            Text(
-                              '${event.cuposDisponibles} / ${event.capacidad}',
-                              style: AppTypography.labelLarge,
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: AppSpacing.sm),
-                        ClipRRect(
-                          borderRadius: AppRadius.fullBorderRadius,
-                          child: LinearProgressIndicator(
-                            value: event.capacidad == 0
-                                ? 0
-                                : event.cuposDisponibles / event.capacidad,
-                            minHeight: 8,
-                            backgroundColor: context.colorScheme.outline
-                                .withValues(alpha: 0.2),
-                            color: eventCuposColor(
-                              context,
-                              event.cuposDisponibles,
-                              event.capacidad,
-                            ),
-                          ),
-                        ),
-                      ],
+                  AppProgressStat(
+                    label: l10n.event_detail_available_spots,
+                    value: '${event.cuposDisponibles} / ${event.capacidad}',
+                    progress: event.capacidad == 0
+                        ? 0
+                        : event.cuposDisponibles / event.capacidad,
+                    variant: eventCuposVariant(
+                      event.cuposDisponibles,
+                      event.capacidad,
                     ),
                   ),
                   const SizedBox(height: AppSpacing.lg),
@@ -258,29 +231,6 @@ class _EventDetailScaffold extends ConsumerWidget {
               ),
             ],
           ),
-        ),
-      ),
-    );
-  }
-}
-
-class _CircleIconButton extends StatelessWidget {
-  const _CircleIconButton({required this.icon, required this.onTap});
-
-  final IconData icon;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    return Material(
-      color: Colors.black.withValues(alpha: 0.35),
-      shape: const CircleBorder(),
-      child: InkWell(
-        onTap: onTap,
-        customBorder: const CircleBorder(),
-        child: Padding(
-          padding: const EdgeInsets.all(AppSpacing.sm),
-          child: Icon(icon, color: Colors.white, size: 20),
         ),
       ),
     );

@@ -1,5 +1,4 @@
 import 'package:app_ui_kit/app_ui_kit.dart';
-import 'package:flutter/material.dart';
 
 String formatEventPrecio(double value) {
   final String integerPart = value.round().toString();
@@ -16,13 +15,10 @@ String formatEventFecha(DateTime fecha) =>
     '${fecha.month.toString().padLeft(2, '0')}/'
     '${fecha.year}';
 
-Color eventCuposColor(
-  BuildContext context,
-  int cuposDisponibles,
-  int capacidad,
-) {
+AppStatusBadgeVariant eventCuposVariant(int cuposDisponibles, int capacidad) {
+  if (cuposDisponibles == 0) return AppStatusBadgeVariant.error;
   final double ratio = capacidad == 0 ? 0 : cuposDisponibles / capacidad;
-  if (cuposDisponibles == 0) return Theme.of(context).colorScheme.error;
-  final AppSemanticColors semanticColors = context.appSemanticColors;
-  return ratio > 0.2 ? semanticColors.success : semanticColors.warning;
+  return ratio > 0.2
+      ? AppStatusBadgeVariant.success
+      : AppStatusBadgeVariant.warning;
 }

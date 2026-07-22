@@ -87,53 +87,23 @@ class _CheckoutBody extends ConsumerWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: <Widget>[
-                AppCard(
-                  child: Row(
+                AppListItemCard(
+                  imageUrl: data.event.imagenUrl,
+                  content: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: <Widget>[
-                      ClipRRect(
-                        borderRadius: AppRadius.mdBorderRadius,
-                        child: Image.network(
-                          data.event.imagenUrl,
-                          width: 56,
-                          height: 56,
-                          fit: BoxFit.cover,
-                          errorBuilder:
-                              (
-                                BuildContext context,
-                                Object error,
-                                StackTrace? stackTrace,
-                              ) => Container(
-                                width: 56,
-                                height: 56,
-                                color:
-                                    context.colorScheme.surfaceContainerHighest,
-                                child: Icon(
-                                  Icons.image_not_supported_outlined,
-                                  color: context.colorScheme.onSurfaceVariant,
-                                ),
-                              ),
-                        ),
+                      Text(
+                        data.event.titulo,
+                        style: AppTypography.titleSmall,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
                       ),
-                      const SizedBox(width: AppSpacing.md),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: <Widget>[
-                            Text(
-                              data.event.titulo,
-                              style: AppTypography.titleSmall,
-                              maxLines: 2,
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                            const SizedBox(height: AppSpacing.xs),
-                            Text(
-                              '${formatEventFecha(data.event.fecha)} · '
-                              '${data.event.hora}',
-                              style: AppTypography.bodySmall.copyWith(
-                                color: context.colorScheme.onSurfaceVariant,
-                              ),
-                            ),
-                          ],
+                      const SizedBox(height: AppSpacing.xs),
+                      Text(
+                        '${formatEventFecha(data.event.fecha)} · '
+                        '${data.event.hora}',
+                        style: AppTypography.bodySmall.copyWith(
+                          color: context.colorScheme.onSurfaceVariant,
                         ),
                       ),
                     ],
@@ -147,55 +117,38 @@ class _CheckoutBody extends ConsumerWidget {
                       l10n.checkout_quantity_label,
                       style: AppTypography.bodyMedium,
                     ),
-                    Row(
-                      children: <Widget>[
-                        IconButton(
-                          icon: const Icon(Icons.remove_circle_outline),
-                          onPressed: quantity > 1
-                              ? () => ref
-                                    .read(
-                                      checkoutQuantityProvider(
-                                        reservationId,
-                                      ).notifier,
-                                    )
-                                    .decrement()
-                              : null,
-                        ),
-                        Text('$quantity', style: AppTypography.titleMedium),
-                        IconButton(
-                          icon: const Icon(Icons.add_circle_outline),
-                          onPressed: quantity < maxQuantity
-                              ? () => ref
-                                    .read(
-                                      checkoutQuantityProvider(
-                                        reservationId,
-                                      ).notifier,
-                                    )
-                                    .increment(maxQuantity)
-                              : null,
-                        ),
-                      ],
+                    AppStepper(
+                      value: quantity,
+                      onDecrement: quantity > 1
+                          ? () => ref
+                                .read(
+                                  checkoutQuantityProvider(
+                                    reservationId,
+                                  ).notifier,
+                                )
+                                .decrement()
+                          : null,
+                      onIncrement: quantity < maxQuantity
+                          ? () => ref
+                                .read(
+                                  checkoutQuantityProvider(
+                                    reservationId,
+                                  ).notifier,
+                                )
+                                .increment(maxQuantity)
+                          : null,
                     ),
                   ],
                 ),
                 const SizedBox(height: AppSpacing.md),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: <Widget>[
-                    Text(
-                      l10n.checkout_price_per_ticket,
-                      style: AppTypography.bodyMedium,
-                    ),
-                    Text(
-                      formatEventPrecio(data.event.precio),
-                      style: AppTypography.labelLarge,
-                    ),
-                  ],
+                AppKeyValueRow(
+                  label: l10n.checkout_price_per_ticket,
+                  value: formatEventPrecio(data.event.precio),
                 ),
                 const SizedBox(height: AppSpacing.lg),
                 AppCard(
                   variant: AppCardVariant.filled,
-                  child: _PriceRow(
+                  child: AppKeyValueRow(
                     label: l10n.checkout_total_label,
                     value: formatEventPrecio(total),
                     emphasize: true,
@@ -237,41 +190,6 @@ class _CheckoutBody extends ConsumerWidget {
               ],
             ),
           ),
-        ),
-      ],
-    );
-  }
-}
-
-class _PriceRow extends StatelessWidget {
-  const _PriceRow({
-    required this.label,
-    required this.value,
-    this.emphasize = false,
-  });
-
-  final String label;
-  final String value;
-  final bool emphasize;
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: <Widget>[
-        Text(
-          label,
-          style: emphasize
-              ? AppTypography.titleSmall
-              : AppTypography.bodyMedium,
-        ),
-        Text(
-          value,
-          style: emphasize
-              ? AppTypography.titleLarge.copyWith(
-                  color: context.colorScheme.primary,
-                )
-              : AppTypography.labelLarge,
         ),
       ],
     );

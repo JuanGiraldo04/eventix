@@ -29,14 +29,7 @@ class ProfilePage extends ConsumerWidget {
             AppCard(
               child: Row(
                 children: <Widget>[
-                  CircleAvatar(
-                    radius: 24,
-                    backgroundColor: context.colorScheme.primaryContainer,
-                    child: Icon(
-                      Icons.person,
-                      color: context.colorScheme.primary,
-                    ),
-                  ),
+                  const AppAvatar(radius: 24),
                   const SizedBox(width: AppSpacing.md),
                   Expanded(
                     child: asyncUser.when(

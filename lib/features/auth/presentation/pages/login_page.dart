@@ -104,7 +104,6 @@ class _LoginForm extends StatefulWidget {
 class _LoginFormState extends State<_LoginForm> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
-  bool _obscurePassword = true;
 
   @override
   void dispose() {
@@ -131,14 +130,7 @@ class _LoginFormState extends State<_LoginForm> {
         AppTextField(
           label: l10n.login_password_label,
           leading: const Icon(Icons.lock_outline),
-          trailing: IconButton(
-            icon: Icon(
-              _obscurePassword ? Icons.visibility_off : Icons.visibility,
-            ),
-            onPressed: () =>
-                setState(() => _obscurePassword = !_obscurePassword),
-          ),
-          obscureText: _obscurePassword,
+          isPassword: true,
           controller: _passwordController,
         ),
         const SizedBox(height: AppSpacing.xl),

@@ -49,21 +49,10 @@ class ConfirmationPage extends ConsumerWidget {
                   mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: <Widget>[
-                    Center(
-                      child: Container(
-                        width: 96,
-                        height: 96,
-                        decoration: BoxDecoration(
-                          color: context.appSemanticColors.success.withValues(
-                            alpha: 0.15,
-                          ),
-                          shape: BoxShape.circle,
-                        ),
-                        child: Icon(
-                          Icons.check_circle,
-                          color: context.appSemanticColors.success,
-                          size: 56,
-                        ),
+                    const Center(
+                      child: AppStatusIcon(
+                        icon: Icons.check_circle,
+                        variant: AppStatusBadgeVariant.success,
                       ),
                     ),
                     const SizedBox(height: AppSpacing.xl),
@@ -86,34 +75,15 @@ class ConfirmationPage extends ConsumerWidget {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: <Widget>[
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: <Widget>[
-                              Text(
-                                l10n.confirmation_tickets_label,
-                                style: AppTypography.bodyMedium,
-                              ),
-                              Text(
-                                '${reservation.cantidadEntradas}',
-                                style: AppTypography.labelLarge,
-                              ),
-                            ],
+                          AppKeyValueRow(
+                            label: l10n.confirmation_tickets_label,
+                            value: '${reservation.cantidadEntradas}',
                           ),
                           const SizedBox(height: AppSpacing.sm),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: <Widget>[
-                              Text(
-                                l10n.confirmation_total_label,
-                                style: AppTypography.bodyMedium,
-                              ),
-                              Text(
-                                formatEventPrecio(reservation.total),
-                                style: AppTypography.titleMedium.copyWith(
-                                  color: context.colorScheme.primary,
-                                ),
-                              ),
-                            ],
+                          AppKeyValueRow(
+                            label: l10n.confirmation_total_label,
+                            value: formatEventPrecio(reservation.total),
+                            emphasize: true,
                           ),
                         ],
                       ),

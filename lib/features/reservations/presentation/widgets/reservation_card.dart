@@ -20,64 +20,33 @@ class ReservationCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final AppLocalizations l10n = AppLocalizations.of(context);
 
-    return AppCard(
+    return AppListItemCard(
+      imageUrl: reservation.eventoImagenUrl,
       onTap: onTap,
-      child: Row(
+      trailing: ReservationStatusBadge(estado: reservation.estado),
+      content: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
-          ClipRRect(
-            borderRadius: AppRadius.mdBorderRadius,
-            child: Image.network(
-              reservation.eventoImagenUrl,
-              width: 56,
-              height: 56,
-              fit: BoxFit.cover,
-              errorBuilder:
-                  (
-                    BuildContext context,
-                    Object error,
-                    StackTrace? stackTrace,
-                  ) => Container(
-                    width: 56,
-                    height: 56,
-                    color: context.colorScheme.surfaceContainerHighest,
-                    child: Icon(
-                      Icons.image_not_supported_outlined,
-                      color: context.colorScheme.onSurfaceVariant,
-                    ),
-                  ),
+          Text(
+            reservation.eventoTitulo,
+            style: AppTypography.titleSmall,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
+          const SizedBox(height: AppSpacing.xs),
+          Text(
+            formatEventFecha(reservation.eventoFecha),
+            style: AppTypography.bodySmall.copyWith(
+              color: context.colorScheme.onSurfaceVariant,
             ),
           ),
-          const SizedBox(width: AppSpacing.md),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                Text(
-                  reservation.eventoTitulo,
-                  style: AppTypography.titleSmall,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
-                const SizedBox(height: AppSpacing.xs),
-                Text(
-                  formatEventFecha(reservation.eventoFecha),
-                  style: AppTypography.bodySmall.copyWith(
-                    color: context.colorScheme.onSurfaceVariant,
-                  ),
-                ),
-                const SizedBox(height: AppSpacing.xs),
-                Text(
-                  '${reservation.cantidadEntradas} '
-                  '${l10n.reservations_entradas_suffix} · '
-                  '${formatEventPrecio(reservation.total)}',
-                  style: AppTypography.bodySmall,
-                ),
-              ],
-            ),
+          const SizedBox(height: AppSpacing.xs),
+          Text(
+            '${reservation.cantidadEntradas} '
+            '${l10n.reservations_entradas_suffix} · '
+            '${formatEventPrecio(reservation.total)}',
+            style: AppTypography.bodySmall,
           ),
-          const SizedBox(width: AppSpacing.sm),
-          ReservationStatusBadge(estado: reservation.estado),
         ],
       ),
     );

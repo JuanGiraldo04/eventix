@@ -125,13 +125,7 @@ class _EventsHeader extends ConsumerWidget {
                       ),
                       GestureDetector(
                         onTap: () => context.go(ProfilePage.routePath),
-                        child: CircleAvatar(
-                          backgroundColor: context.colorScheme.primaryContainer,
-                          child: Icon(
-                            Icons.person,
-                            color: context.colorScheme.primary,
-                          ),
-                        ),
+                        child: const AppAvatar(),
                       ),
                     ],
                   ),
@@ -193,41 +187,22 @@ class _EventFiltersBar extends ConsumerWidget {
         Row(
           children: <Widget>[
             Expanded(
-              child: DropdownButtonFormField<String>(
-                initialValue: filter.ciudad,
-                isExpanded: true,
-                hint: Text(
-                  l10n.events_filter_city_all,
-                  overflow: TextOverflow.ellipsis,
-                ),
-                items: <DropdownMenuItem<String>>[
-                  for (final String ciudad in kEventCities)
-                    DropdownMenuItem<String>(
-                      value: ciudad,
-                      child: Text(ciudad, overflow: TextOverflow.ellipsis),
-                    ),
-                ],
+              child: AppDropdown<String>(
+                items: kEventCities,
+                itemLabel: (String ciudad) => ciudad,
+                value: filter.ciudad,
+                hint: l10n.events_filter_city_all,
                 onChanged: notifier.setCiudad,
               ),
             ),
             const SizedBox(width: AppSpacing.md),
             Expanded(
-              child: OutlinedButton.icon(
-                icon: const Icon(Icons.calendar_today_outlined, size: 18),
-                label: Text(
-                  filter.fecha == null
-                      ? l10n.events_filter_date_label
-                      : '${filter.fecha!.day.toString().padLeft(2, '0')}/'
-                            '${filter.fecha!.month.toString().padLeft(2, '0')}/'
-                            '${filter.fecha!.year}',
-                ),
-                onPressed: () async {
-                  final DateTime? picked = await showDatePicker(
-                    context: context,
-                    initialDate: filter.fecha ?? DateTime.now(),
-                    firstDate: DateTime.now().subtract(const Duration(days: 1)),
-                    lastDate: DateTime.now().add(const Duration(days: 365)),
-                  );
+              child: AppDateField(
+                value: filter.fecha,
+                hint: l10n.events_filter_date_label,
+                firstDate: DateTime.now().subtract(const Duration(days: 1)),
+                lastDate: DateTime.now().add(const Duration(days: 365)),
+                onChanged: (DateTime? picked) {
                   if (picked != null) notifier.setFecha(picked);
                 },
               ),
