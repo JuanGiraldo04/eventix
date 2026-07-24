@@ -171,17 +171,81 @@ La UI nunca ve una excepción cruda: `.when(loading:, error:, data:)` en cada pa
 
 ---
 
+## Pruebas
+
+### Demo
+https://www.loom.com/share/6e452b84bae249df877dedff144dba0e
+
+| Capa | Qué verifica | Herramientas | Dónde vive |
+|---|---|---|---|
+| **Unitaria** | Un usecase delega bien al repository; un mapper convierte modelos → entidades sin pérdida; un `AsyncNotifier` cambia de estado correctamente; un repository impl propaga `Failure` sin modificarlo | `mocktail`, `ProviderContainer` | `test/features/*/domain`, `.../infrastructure`, `.../presentation/providers` |
+| **Widget** | Una pantalla aislada renderiza lo correcto para cada estado (`loading` / `data` / `error` / vacío) sin depender de red ni backend real | `flutter_test`, overrides de Riverpod | `test/features/*/presentation/pages` |
+| **Integración (E2E)** | El flujo completo tal como lo vive un usuario: Registro, Login, Filtros, Reserva completa — app real, navegación real, backend Supabase real | `integration_test`, simulador/device real | `integration_test/app_test.dart` |
+
+Los datasources que hablan directo con el SDK de Supabase
+(`Supabase*Datasource`) son un caso especial: en vez de mockear su cadena de
+query builders (frágil — son clases concretas del SDK, no interfaces
+pequeñas), se prueban contra un `SupabaseClient` real apuntando a un host
+inexistente, para verificar de forma determinística que cada método traduce
+el error de red a la jerarquía `Failure` del proyecto (`mapSupabaseError`).
+El *happy path* completo de esos mismos métodos queda cubierto por las
+pruebas de integración, que sí hablan con el backend real.
+
+### Qué se probó y por qué
+
+| Área | Qué se probó | Por qué importa |
+|---|---|---|
+| **Auth** (login, registro, logout, sesión actual) | Mapeo de credenciales inválidas → `UnauthorizedFailure`; delegación usecase → repository; propagación de `Failure` desde el datasource sin perderse; flujo real registro → logout → login en integración | Es la puerta de entrada a toda la app — el `redirect` global del router depende de esto (sesión de Supabase). Un fallo acá bloquea absolutamente todo lo demás |
+| **Events** (listado + filtros) | `EventFilterNotifier` cambia solo el campo que se le pide sin tocar el resto del filtro; la página muestra `loading` / datos / `AppEmptyState` / `AppErrorState` según el estado; en integración, aplicar un filtro de categoría contra datos reales y verificar que **solo** aparecen eventos de esa categoría | Es la pantalla principal y los filtros son combinables (categoría + ciudad + fecha + búsqueda) — la forma en que interactúan entre sí es fácil de romper sin darse cuenta al tocar el provider |
+| **Reservations / Checkout / Confirmación** | Los usecases `createReservation` / `updateReservationQuantity` / `confirmReservation` delegan bien y propagan `Failure`; **`ConfirmPurchaseNotifier` prueba explícitamente que si falla la actualización de cantidad, `confirmReservation` nunca se llama** (evita confirmar una compra con datos a medio actualizar); en integración, el flujo real completo reserva → checkout → confirmar → aparece en "Mis reservas", que ejercita la RPC transaccional `confirmar_reserva` contra la base de datos real | Es el flujo de negocio más crítico: hay cupos limitados y una compra en firme de por medio. Una condición de carrera o una confirmación parcial acá es el tipo de bug que llega a producción y cuesta dinero real, no solo una UI rota |
+| **Profile** | Nombre/email del usuario se muestran correctamente; el botón de logout muestra el error del `Failure` si el logout falla | Además de la pantalla en sí, dispara el logout que el `redirect` global del router usa para decidir a dónde mandar al usuario |
+| **Modelos y mappers remotos** | `fromJson` de cada modelo remoto, incluyendo los que traen un *join* anidado (`events(...)` dentro de una reserva); el mapper convierte a la entidad de dominio sin perder ni transformar mal ningún campo | Es el punto donde el JSON de Supabase (snake_case, con nombres de columna reales) se convierte a las entidades Dart de la app. Un desajuste de nombre de campo acá **no rompe la compilación** — rompe en runtime, silenciosamente, con datos reales |
+| **Repository impl** | Un resultado exitoso del datasource se envuelve en `Success<T>`; una excepción (incluyendo un `Failure` ya tipado) se envuelve en `FailureResult<T>` **sin perder el tipo original** de `Failure` | Es la capa donde `executeRepositoryCall` decide si la UI ve `AsyncData` o `AsyncError` — si acá se pierde el tipo de `Failure`, el usuario ve "Error inesperado" en vez del mensaje real ("Sin conexión", "Correo o clave incorrectos", etc.) |
+| **Datasources Supabase directos** | Que cada método realmente traduce un error de red a la jerarquía `Failure` del proyecto (ver nota arriba) | Es el único punto que habla con el SDK de Supabase sin pasar por una interfaz propia — si algo cambia en cómo el SDK reporta errores, se detecta acá |
+| **Integración (4 flujos)** | Registro, Login, Filtros, Reserva completa — elegidos porque son el *critical path* de negocio: sin poder registrarse/loguearse nadie entra a la app; sin filtros la navegación de un catálogo de eventos es inusable; sin poder reservar, no hay producto | Es la única capa que valida routing real, RLS real (si una policy estuviera mal, un usuario real no podría leer/escribir su propia fila y el flujo fallaría) y contratos de red reales — nada de esto lo puede detectar un mock |
+
+### Cobertura
+
+**89.1% de líneas** (908/1019, tras excluir código generado y localización),
+por encima del 80% objetivo del proyecto — 174 pruebas unitarias/widget en 57
+archivos + 4 flujos de integración, todas en verde.
+
+Regenerar y ver el reporte localmente:
+
+```bash
+./coverage.sh
+# abre coverage/html/index.html
+```
+
+`coverage/` está en `.gitignore` — es un artefacto regenerable, no se versiona.
+
+### Cómo correrlas
+
+```bash
+# Unitarias + widget (rápidas, sin dispositivo)
+flutter test
+
+# Integración (necesita un simulador/device/navegador real — ver flutter devices)
+flutter test integration_test/app_test.dart
+```
+
+⚠️ Los 4 flujos de integración corren contra el proyecto Supabase configurado
+en `.env` y **crean una cuenta de usuario y una reserva reales** en cada
+corrida (no hay limpieza automática todavía).
+
+---
+
 ## Environment setup
 
-This project uses [envied](https://pub.dev/packages/envied) to handle environment variables securely. The Supabase URL and key are obfuscated at compile time and never exposed in the binary.
+Este proyecto usa [envied](https://pub.dev/packages/envied) para manejar las variables de entorno.
 
-1. Create a `.env` file in the root of the project:
+1. Crea un archivo `.env` en la raiz del proyecto:
 
 ```
 cp .env.example .env
 ```
 
-2. Add your Supabase project credentials to `.env`:
+2. Agrega tus credenciales de supabase en `.env`:
 
 ```
 SUPABASE_URL=your_supabase_project_url_here
