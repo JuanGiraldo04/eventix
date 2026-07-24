@@ -217,8 +217,6 @@ Regenerar y ver el reporte localmente:
 # abre coverage/html/index.html
 ```
 
-`coverage/` está en `.gitignore` — es un artefacto regenerable, no se versiona.
-
 ### Cómo correrlas
 
 ```bash
