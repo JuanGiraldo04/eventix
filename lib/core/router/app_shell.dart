@@ -1,15 +1,18 @@
-import 'package:eventix/core/l10n/app_localizations.dart';
+import 'package:eventix/core/config/app_config.dart';
+import 'package:eventix/core/config/app_config_provider.dart';
+import 'package:eventix/core/config/config_icons.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-class AppShell extends StatelessWidget {
+class AppShell extends ConsumerWidget {
   const AppShell({required this.navigationShell, super.key});
 
   final StatefulNavigationShell navigationShell;
 
   @override
-  Widget build(BuildContext context) {
-    final AppLocalizations l10n = AppLocalizations.of(context);
+  Widget build(BuildContext context, WidgetRef ref) {
+    final AppConfig config = ref.watch(appConfigProvider).requireValue;
 
     return Scaffold(
       body: navigationShell,
@@ -21,19 +24,16 @@ class AppShell extends StatelessWidget {
         ),
         destinations: <Widget>[
           NavigationDestination(
-            icon: const Icon(Icons.explore_outlined),
-            selectedIcon: const Icon(Icons.explore),
-            label: l10n.nav_explore,
+            icon: Icon(iconByName(config.navbar.explorarIcono)),
+            label: config.navbar.explorar,
           ),
           NavigationDestination(
-            icon: const Icon(Icons.confirmation_number_outlined),
-            selectedIcon: const Icon(Icons.confirmation_number),
-            label: l10n.nav_reservations,
+            icon: Icon(iconByName(config.navbar.reservasIcono)),
+            label: config.navbar.reservas,
           ),
           NavigationDestination(
-            icon: const Icon(Icons.person_outline),
-            selectedIcon: const Icon(Icons.person),
-            label: l10n.nav_profile,
+            icon: Icon(iconByName(config.navbar.perfilIcono)),
+            label: config.navbar.perfil,
           ),
         ],
       ),

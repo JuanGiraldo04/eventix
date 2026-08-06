@@ -1,4 +1,6 @@
 import 'package:app_ui_kit/app_ui_kit.dart';
+import 'package:eventix/core/config/app_config.dart';
+import 'package:eventix/core/config/app_config_provider.dart';
 import 'package:eventix/core/errors/failure.dart';
 import 'package:eventix/core/extensions/theme_extension.dart';
 import 'package:eventix/core/l10n/app_localizations.dart';
@@ -20,6 +22,7 @@ class LoginPage extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final AsyncValue<AppUser?> asyncUser = ref.watch(loginProvider);
     final AppLocalizations l10n = AppLocalizations.of(context);
+    final AppConfig config = ref.watch(appConfigProvider).requireValue;
 
     ref.listen(loginProvider, (
       AsyncValue<AppUser?>? previous,
@@ -39,13 +42,13 @@ class LoginPage extends ConsumerWidget {
               const Center(child: EventixLogo()),
               const SizedBox(height: AppSpacing.lg),
               Text(
-                l10n.app_name,
+                config.auth.login.titulo,
                 textAlign: TextAlign.center,
                 style: AppTypography.headlineMedium,
               ),
               const SizedBox(height: AppSpacing.xs),
               Text(
-                l10n.login_tagline,
+                config.auth.login.subtitulo,
                 textAlign: TextAlign.center,
                 style: AppTypography.bodyMedium.copyWith(
                   color: context.colorScheme.onSurfaceVariant,
@@ -65,6 +68,7 @@ class LoginPage extends ConsumerWidget {
               ],
               _LoginForm(
                 isLoading: asyncUser.isLoading,
+                buttonLabel: config.auth.login.boton,
                 onSubmit: (String email, String password) => ref
                     .read(loginProvider.notifier)
                     .login(email: email, password: password),
@@ -92,9 +96,14 @@ class LoginPage extends ConsumerWidget {
 }
 
 class _LoginForm extends StatefulWidget {
-  const _LoginForm({required this.isLoading, required this.onSubmit});
+  const _LoginForm({
+    required this.isLoading,
+    required this.buttonLabel,
+    required this.onSubmit,
+  });
 
   final bool isLoading;
+  final String buttonLabel;
   final void Function(String email, String password) onSubmit;
 
   @override
@@ -135,7 +144,7 @@ class _LoginFormState extends State<_LoginForm> {
         ),
         const SizedBox(height: AppSpacing.xl),
         AppButton(
-          label: l10n.login_submit,
+          label: widget.buttonLabel,
           isLoading: widget.isLoading,
           isFullWidth: true,
           onPressed: () => widget.onSubmit(

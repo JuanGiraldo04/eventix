@@ -1,4 +1,6 @@
 import 'package:app_ui_kit/app_ui_kit.dart';
+import 'package:eventix/core/config/app_config.dart';
+import 'package:eventix/core/config/app_config_provider.dart';
 import 'package:eventix/core/errors/failure.dart';
 import 'package:eventix/core/extensions/theme_extension.dart';
 import 'package:eventix/core/l10n/app_localizations.dart';
@@ -24,6 +26,7 @@ class ConfirmationPage extends ConsumerWidget {
       reservationDetailProvider(reservationId),
     );
     final AppLocalizations l10n = AppLocalizations.of(context);
+    final AppConfig config = ref.watch(appConfigProvider).requireValue;
 
     return Scaffold(
       backgroundColor: context.colorScheme.secondary,
@@ -57,13 +60,15 @@ class ConfirmationPage extends ConsumerWidget {
                     ),
                     const SizedBox(height: AppSpacing.xl),
                     Text(
-                      l10n.confirmation_title,
+                      config.confirmacion.titulo,
                       textAlign: TextAlign.center,
                       style: AppTypography.headlineMedium,
                     ),
                     const SizedBox(height: AppSpacing.sm),
                     Text(
-                      l10n.confirmation_subtitle(reservation.eventoTitulo),
+                      config.confirmacion.subtituloPara(
+                        reservation.eventoTitulo,
+                      ),
                       textAlign: TextAlign.center,
                       style: AppTypography.bodyMedium.copyWith(
                         color: context.colorScheme.onSurfaceVariant,
@@ -76,12 +81,12 @@ class ConfirmationPage extends ConsumerWidget {
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: <Widget>[
                           AppKeyValueRow(
-                            label: l10n.confirmation_tickets_label,
+                            label: config.confirmacion.entradasLabel,
                             value: '${reservation.cantidadEntradas}',
                           ),
                           const SizedBox(height: AppSpacing.sm),
                           AppKeyValueRow(
-                            label: l10n.confirmation_total_label,
+                            label: config.confirmacion.totalLabel,
                             value: formatEventPrecio(reservation.total),
                             emphasize: true,
                           ),
@@ -90,13 +95,13 @@ class ConfirmationPage extends ConsumerWidget {
                     ),
                     const SizedBox(height: AppSpacing.xxl),
                     AppButton(
-                      label: l10n.confirmation_view_reservations,
+                      label: config.confirmacion.botonVerReservas,
                       isFullWidth: true,
                       onPressed: () => context.go(ReservationsPage.routePath),
                     ),
                     const SizedBox(height: AppSpacing.md),
                     AppButton(
-                      label: l10n.confirmation_back_home,
+                      label: config.confirmacion.botonVolverInicio,
                       variant: AppButtonVariant.outlined,
                       isFullWidth: true,
                       onPressed: () => context.go(EventsPage.routePath),

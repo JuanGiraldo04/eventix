@@ -122,6 +122,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get profile_logout => 'Sign out';
 
   @override
+  String get profile_toggle_config_tooltip => 'Switch configuration';
+
+  @override
   String get reservations_title => 'My reservations';
 
   @override

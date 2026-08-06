@@ -1,0 +1,90 @@
+{
+  "app": {
+    "nombre": "SportPass",
+    "slogan": "Vive el deporte en vivo"
+  },
+  "auth": {
+    "login": {
+      "titulo": "¡Hola de nuevo!",
+      "subtitulo": "El deporte te espera",
+      "boton": "Entrar"
+    },
+    "registro": {
+      "titulo": "Únete ahora",
+      "subtitulo": "Regístrate y empieza a disfrutar",
+      "boton": "Registrarme"
+    }
+  },
+  "eventos": {
+    "titulo_seccion": "Próximos eventos",
+    "saludo": "¡Qué tal,",
+    "saludo_emoji": "🏆",
+    "categorias": [
+      { "id": "futbol", "label": "Soccer", "icono": "emoji_events" },
+      { "id": "baloncesto", "label": "Basketball", "icono": "scoreboard" },
+      { "id": "tenis", "label": "Tennis", "icono": "fitness_center" },
+      { "id": "atletismo", "label": "Athletics", "icono": "directions_bike" },
+      { "id": "natacion", "label": "Swimming", "icono": "waves" }
+    ],
+    "estado_vacio": {
+      "titulo": "Nada por aquí",
+      "mensaje": "Prueba con otros filtros o vuelve más tarde."
+    }
+  },
+  "reservas": {
+    "titulo_seccion": "Mis tickets",
+    "estado_vacio": {
+      "titulo": "Sin tickets",
+      "mensaje": "Reserva tu primer evento y aparecerá aquí."
+    }
+  },
+  "banners": [
+    {
+      "id": "banner_1",
+      "activo": true,
+      "titulo": "Oferta de temporada",
+      "mensaje": "20% de descuento en eventos de atletismo este mes.",
+      "variante": "success"
+    },
+    {
+      "id": "banner_2",
+      "activo": true,
+      "titulo": "SportPass Plus",
+      "mensaje": "Suscríbete y obtén acceso anticipado a la venta de entradas.",
+      "variante": "info"
+    },
+    {
+      "id": "banner_3",
+      "activo": true,
+      "titulo": "Alerta de clima",
+      "mensaje": "Posibles lluvias este fin de semana en Bogotá.",
+      "variante": "warning"
+    }
+  ],
+  "checkout": {
+    "titulo": "Resumen de compra",
+    "cantidad_label": "Cantidad de tickets",
+    "precio_label": "Precio por ticket",
+    "total_label": "Total a pagar",
+    "boton_confirmar": "Pagar ahora"
+  },
+  "confirmacion": {
+    "titulo": "¡Todo listo!",
+    "subtitulo_template": "Tu cupo para {evento} quedó confirmado.",
+    "entradas_label": "Tickets",
+    "total_label": "Total pagado",
+    "boton_ver_reservas": "Ver mis tickets",
+    "boton_volver_inicio": "Explorar más"
+  },
+  "navbar": {
+    "explorar": "Buscar",
+    "explorar_icono": "search",
+    "reservas": "Tickets",
+    "reservas_icono": "local_activity",
+    "perfil": "Cuenta",
+    "perfil_icono": "account_circle"
+  },
+  "perfil": {
+    "icono": "military_tech"
+  }
+}

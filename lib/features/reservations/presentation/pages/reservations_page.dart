@@ -1,4 +1,6 @@
 import 'package:app_ui_kit/app_ui_kit.dart';
+import 'package:eventix/core/config/app_config.dart';
+import 'package:eventix/core/config/app_config_provider.dart';
 import 'package:eventix/core/errors/failure.dart';
 import 'package:eventix/core/l10n/app_localizations.dart';
 import 'package:eventix/features/reservations/domain/entities/reservation.dart';
@@ -20,9 +22,10 @@ class ReservationsPage extends ConsumerWidget {
       myReservationsProvider,
     );
     final AppLocalizations l10n = AppLocalizations.of(context);
+    final AppConfig config = ref.watch(appConfigProvider).requireValue;
 
     return Scaffold(
-      appBar: AppBar(title: Text(l10n.reservations_title)),
+      appBar: AppBar(title: Text(config.reservas.tituloSeccion)),
       body: asyncReservations.when(
         loading: () =>
             const Center(child: AppLoader(size: AppLoaderSize.large)),
@@ -36,8 +39,8 @@ class ReservationsPage extends ConsumerWidget {
         data: (List<ReservationSummary> reservations) {
           if (reservations.isEmpty) {
             return AppEmptyState(
-              title: l10n.reservations_empty_title,
-              message: l10n.reservations_empty_message,
+              title: config.reservas.estadoVacio.titulo,
+              message: config.reservas.estadoVacio.mensaje,
             );
           }
 

@@ -36,7 +36,10 @@ void main() {
         expect(find.text(l10n.register_name_label), findsOneWidget);
         expect(find.text(l10n.login_email_label), findsOneWidget);
         expect(find.text(l10n.login_password_label), findsOneWidget);
-        expect(find.text(l10n.register_submit), findsOneWidget);
+        expect(
+          find.text(testAppConfig.auth.registro.boton),
+          findsOneWidget,
+        );
       },
     );
   });

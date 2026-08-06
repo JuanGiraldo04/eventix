@@ -1,0 +1,90 @@
+{
+  "app": {
+    "nombre": "Eventix",
+    "slogan": "Tu entrada al deporte"
+  },
+  "auth": {
+    "login": {
+      "titulo": "Bienvenido de nuevo",
+      "subtitulo": "Inicia sesión para continuar",
+      "boton": "Iniciar sesión"
+    },
+    "registro": {
+      "titulo": "Crea tu cuenta",
+      "subtitulo": "Únete a Eventix hoy",
+      "boton": "Crear cuenta"
+    }
+  },
+  "eventos": {
+    "titulo_seccion": "Eventos disponibles",
+    "saludo": "Hola,",
+    "saludo_emoji": "👋",
+    "categorias": [
+      { "id": "futbol", "label": "Fútbol", "icono": "sports_soccer" },
+      { "id": "baloncesto", "label": "Baloncesto", "icono": "sports_basketball" },
+      { "id": "tenis", "label": "Tenis", "icono": "sports_tennis" },
+      { "id": "atletismo", "label": "Atletismo", "icono": "directions_run" },
+      { "id": "natacion", "label": "Natación", "icono": "pool" }
+    ],
+    "estado_vacio": {
+      "titulo": "Sin eventos",
+      "mensaje": "No hay eventos disponibles con los filtros aplicados."
+    }
+  },
+  "reservas": {
+    "titulo_seccion": "Mis entradas",
+    "estado_vacio": {
+      "titulo": "Sin reservas",
+      "mensaje": "Aún no tienes entradas. ¡Explora los eventos!"
+    }
+  },
+  "banners": [
+    {
+      "id": "banner_1",
+      "activo": true,
+      "titulo": "Final de Champions",
+      "mensaje": "Entradas disponibles por tiempo limitado.",
+      "variante": "info"
+    },
+    {
+      "id": "banner_2",
+      "activo": true,
+      "titulo": "Nuevo: pago en cuotas",
+      "mensaje": "Paga tus entradas en 3 cuotas sin interés.",
+      "variante": "success"
+    },
+    {
+      "id": "banner_3",
+      "activo": false,
+      "titulo": "Mantenimiento programado",
+      "mensaje": "El sábado habrá mantenimiento entre 2am y 4am.",
+      "variante": "warning"
+    }
+  ],
+  "checkout": {
+    "titulo": "Confirmar reserva",
+    "cantidad_label": "Cantidad de entradas",
+    "precio_label": "Precio por entrada",
+    "total_label": "Total",
+    "boton_confirmar": "Confirmar compra"
+  },
+  "confirmacion": {
+    "titulo": "¡Reserva confirmada!",
+    "subtitulo_template": "Tu lugar en {evento} está asegurado.",
+    "entradas_label": "Entradas",
+    "total_label": "Total pagado",
+    "boton_ver_reservas": "Ver mis reservas",
+    "boton_volver_inicio": "Volver al inicio"
+  },
+  "navbar": {
+    "explorar": "Explorar",
+    "explorar_icono": "explore",
+    "reservas": "Reservas",
+    "reservas_icono": "confirmation_number",
+    "perfil": "Perfil",
+    "perfil_icono": "person"
+  },
+  "perfil": {
+    "icono": "person"
+  }
+}

@@ -35,6 +35,9 @@ dev_dependencies:
 flutter:
   generate: true
   uses-material-design: true
+  assets:
+    - assets/config/app_config.json
+    - assets/config/app_config_alt.json
 
 flutter_intl:
   enabled: true

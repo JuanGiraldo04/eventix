@@ -1,4 +1,6 @@
 import 'package:app_ui_kit/app_ui_kit.dart';
+import 'package:eventix/core/config/app_config.dart';
+import 'package:eventix/core/config/app_config_provider.dart';
 import 'package:eventix/core/env/env.dart';
 import 'package:eventix/core/l10n/app_localizations.dart';
 import 'package:eventix/core/router/app_router.dart';
@@ -22,17 +24,52 @@ class MainApp extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final ThemeMode themeMode = ref.watch(themeModeProvider);
+    final AsyncValue<AppConfig> asyncConfig = ref.watch(appConfigProvider);
 
-    return MaterialApp.router(
+    return asyncConfig.when(
+      loading: () => _ConfigStatusApp(
+        themeMode: themeMode,
+        child: const Center(child: AppLoader(size: AppLoaderSize.large)),
+      ),
+      error: (Object error, StackTrace _) => _ConfigStatusApp(
+        themeMode: themeMode,
+        child: Builder(
+          builder: (BuildContext context) => AppErrorState(
+            message: AppLocalizations.of(context).common_unexpected_error,
+            onRetry: () => ref.invalidate(appConfigProvider),
+          ),
+        ),
+      ),
+      data: (AppConfig config) => MaterialApp.router(
+        debugShowCheckedModeBanner: false,
+        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        supportedLocales: AppLocalizations.supportedLocales,
+        onGenerateTitle: (BuildContext context) => config.app.nombre,
+        theme: AppTheme.light(),
+        darkTheme: AppTheme.dark(),
+        themeMode: themeMode,
+        routerConfig: appRouter,
+      ),
+    );
+  }
+}
+
+class _ConfigStatusApp extends StatelessWidget {
+  const _ConfigStatusApp({required this.themeMode, required this.child});
+
+  final ThemeMode themeMode;
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
       debugShowCheckedModeBanner: false,
       localizationsDelegates: AppLocalizations.localizationsDelegates,
       supportedLocales: AppLocalizations.supportedLocales,
-      onGenerateTitle: (BuildContext context) =>
-          AppLocalizations.of(context).app_name,
       theme: AppTheme.light(),
       darkTheme: AppTheme.dark(),
       themeMode: themeMode,
-      routerConfig: appRouter,
+      home: Scaffold(body: child),
     );
   }
 }

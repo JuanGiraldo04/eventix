@@ -206,8 +206,8 @@ pruebas de integración, que sí hablan con el backend real.
 
 ### Cobertura
 
-**89.1% de líneas** (908/1019, tras excluir código generado y localización),
-por encima del 80% objetivo del proyecto — 174 pruebas unitarias/widget en 57
+**90.2% de líneas** (1079/1196, tras excluir código generado y localización),
+por encima del 80% objetivo del proyecto — 183 pruebas unitarias/widget en 59
 archivos + 4 flujos de integración, todas en verde.
 
 Regenerar y ver el reporte localmente:
@@ -271,3 +271,80 @@ flutter run
 ```
 
 El schema de base de datos vive versionado en `supabase/migrations` — aplícalo con la CLI de Supabase (`supabase db push`) o revisa cada archivo para reproducirlo manualmente.
+
+---
+
+## Configuración parametrizable por JSON
+
+### Demo
+https://www.loom.com/share/e1081fd8379b4de2a33229c660f74439
+
+Los textos y valores de algunas pantallas no están hardcodeados en el código — vienen de un archivo JSON local que se carga una sola vez al iniciar la app. Cambiar ese archivo cambia el comportamiento visible de la app sin tocar ninguna pantalla ni recompilar lógica de negocio.
+
+### Dónde vive
+
+- [`assets/config/app_config.json`](assets/config/app_config.json) — configuración activa por defecto.
+- [`assets/config/app_config_alt.json`](assets/config/app_config_alt.json) — una segunda configuración con valores distintos, pensada para demostrar el toggle (cambia nombre de la app, textos de auth, títulos de sección y el banner).
+- Se deserializan con modelos `fromJson` manuales en [`lib/core/config/`](lib/core/config/) (sin code generation) y se exponen vía Riverpod en [`app_config_provider.dart`](lib/core/config/app_config_provider.dart): `activeConfigPathProvider` controla cuál de los dos archivos está activo, `appConfigProvider` lo carga y lo parsea.
+- El botón de swap (ícono ⇄) en el AppBar de **Perfil** alterna entre ambos archivos — toda la app se re-renderiza sola porque `appConfigProvider` depende de `activeConfigPathProvider`.
+
+### Qué es parametrizable
+
+| Sección del JSON | Dónde se aplica |
+|---|---|
+| `app.nombre` | Título de la app a nivel de sistema (`onGenerateTitle`) |
+| `auth.login.*` / `auth.registro.*` | Título, subtítulo y label del botón en Login y Registro |
+| `eventos.tituloSeccion` | Encabezado de sección sobre la lista de eventos |
+| `eventos.saludo` / `.saludoEmoji` | El saludo del header de Eventos (`"Hola, <nombre>" + emoji`) |
+| `eventos.categorias` | Chips de filtro por categoría — **label e ícono**, ambos visibles |
+| `eventos.estadoVacio` | Título/mensaje del `AppEmptyState` cuando un filtro no encuentra eventos |
+| `reservas.tituloSeccion` | Título del AppBar en "Mis reservas" |
+| `reservas.estadoVacio` | Título/mensaje del `AppEmptyState` cuando no hay reservas |
+| `banners` | Banners informativos sobre la lista de eventos, uno por cada entrada con `activo: true` |
+| `checkout.*` | Título del AppBar, label de cantidad/precio/total y label del botón de confirmar en el checkout |
+| `confirmacion.*` | Título, subtítulo (con `{evento}` interpolado), labels de entradas/total y los dos botones en la pantalla de confirmación de compra |
+| `navbar.*` | Los 3 labels **y los 3 íconos** del bottom nav |
+| `perfil.icono` | Ícono decorativo mostrado arriba de la card de perfil |
+
+`app.slogan` se parsea y queda disponible en el modelo, pero hoy no se usa en ninguna pantalla — es un campo libre para cuando se necesite (splash, about, etc.).
+
+Los nombres de ícono (`eventos.categorias[].icono`, `navbar.*_icono`, `perfil.icono`) se resuelven con un único registro compartido: [`iconByName`](lib/core/config/config_icons.dart). Un nombre no reconocido cae a un ícono genérico en vez de romper la app.
+
+### Detalle importante: categorías e `id` vs. `label`
+
+El `id` de cada categoría (`"futbol"`, `"baloncesto"`, …) es el identificador estable que se traduce internamente al valor real que Supabase guarda en `events.categoria` (`"Fútbol"`, `"Baloncesto"`, …, ver [`supabase/seed.sql`](supabase/seed.sql)). El `label` es solo el texto visible del chip. Esto es intencional: si el filtro usara directamente el `label`, activar `app_config_alt.json` (que muestra "Soccer" en vez de "Fútbol") rompería la búsqueda contra datos reales, porque no existe ningún evento con `categoria = "Soccer"` en la base de datos. La traducción `id → valor real` vive en `categoriaBackendValueById` dentro de [`events_page.dart`](lib/features/events/presentation/pages/events_page.dart).
+
+### Cómo agregar una nueva categoría
+
+1. Agrega la entrada en `eventos.categorias` en **ambos** JSON (`app_config.json` y `app_config_alt.json`), con un `id` nuevo y el nombre de ícono que quieras usar (ej. `"sports_volleyball"`).
+2. Registra ese `id` en el mapa `categoriaBackendValueById` de `events_page.dart`, apuntando al valor exacto que existe (o vas a crear) en la columna `events.categoria`.
+3. Si el ícono no está en el switch de `iconByName` ([`config_icons.dart`](lib/core/config/config_icons.dart)), agrégalo ahí — si no lo reconoce, cae a un ícono genérico por defecto. Es el mismo registro que usan `navbar.*_icono` y `perfil.icono`, así que agregarlo ahí lo deja disponible para las tres secciones.
+
+### Cómo activar o desactivar un banner
+
+Cambia `"activo": true` a `"activo": false` (o viceversa) en la entrada correspondiente dentro de `banners`, en el JSON que quieras editar. Un banner con `activo: false` no se renderiza. Se pueden tener varios banners activos a la vez — se muestran todos, en orden, sobre la lista de eventos. El campo `variante` acepta `"info"`, `"success"`, `"warning"` o `"error"` (cualquier otro valor cae a `"info"`).
+
+### Cómo cambiar los textos de auth
+
+Edita `auth.login.titulo` / `.subtitulo` / `.boton` o `auth.registro.titulo` / `.subtitulo` / `.boton` en el JSON. No hace falta tocar `LoginPage` ni `RegisterPage` — leen esos valores directamente de `appConfigProvider`.
+
+⚠️ A diferencia del resto de la app (que usa ARB + `AppLocalizations` para es/en), estos textos **no están localizados** — el JSON define un solo idioma fijo. Si el dispositivo está en inglés, Login/Registro van a mostrar igual el texto del JSON (español), mientras que los labels de los campos (email, contraseña) sí cambian de idioma porque esos siguen viniendo de los ARB. Es una limitación consciente de este mecanismo, no un bug.
+
+### Cómo cambiar los textos de checkout, confirmación y navbar
+
+Igual que con auth: edita `checkout.*` / `confirmacion.*` / `navbar.*` en el JSON, sin tocar código. Dos detalles:
+
+- `confirmacion.subtituloTemplate` acepta el placeholder literal `{evento}` — `ConfirmacionConfig.subtituloPara(titulo)` lo reemplaza por el título real del evento reservado. Si quitas el placeholder, el texto simplemente no interpola nada.
+- El navbar (`AppShell`, fuera de las rutas con `Scaffold` propio) también depende de `appConfigProvider` — por eso el toggle en Perfil cambia los 3 labels **y los 3 íconos** del bottom nav sin necesidad de reiniciar la app.
+
+### Cómo cambiar los íconos (categorías, navbar, perfil)
+
+Todos los nombres de ícono del JSON se resuelven con el mismo registro,
+[`iconByName`](lib/core/config/config_icons.dart) — no hay un mapeo distinto
+por sección:
+
+- `eventos.categorias[].icono` — ícono de cada chip de filtro.
+- `navbar.explorar_icono` / `.reservas_icono` / `.perfil_icono` — íconos del bottom nav (una sola variante por tab, sin distinción outlined/filled al seleccionar — simplificación intencional).
+- `perfil.icono` — el ícono decorativo circular arriba de la card de perfil.
+
+Para usar un ícono nuevo: agrega el `case` correspondiente en `iconByName` (nombre de string → `Icons.xxx`) y después referencia ese mismo nombre desde cualquiera de las tres secciones. Un nombre no registrado no rompe la app — cae a un ícono genérico (`Icons.sports`).

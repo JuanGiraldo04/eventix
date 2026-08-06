@@ -1,4 +1,5 @@
 import 'package:app_ui_kit/app_ui_kit.dart';
+import 'package:eventix/core/config/app_config_provider.dart';
 import 'package:eventix/core/errors/failure.dart';
 import 'package:eventix/core/helpers/result.dart';
 import 'package:eventix/core/l10n/app_localizations.dart';
@@ -7,6 +8,8 @@ import 'package:eventix/features/auth/domain/entities/app_user.dart';
 import 'package:eventix/features/auth/domain/usecases/get_current_user.dart';
 import 'package:eventix/features/auth/domain/usecases/logout_user.dart';
 import 'package:eventix/features/profile/presentation/pages/profile_page.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:riverpod/src/framework.dart' show Override;
@@ -80,6 +83,42 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.byType(AppBanner), findsOneWidget);
+    });
+
+    testWidgets('shows a tooltip on the config toggle button', (
+      WidgetTester tester,
+    ) async {
+      await pumpProfile(tester);
+      final AppLocalizations l10n = AppLocalizations.of(
+        tester.element(find.byType(ProfilePage)),
+      );
+
+      expect(
+        find.byTooltip(l10n.profile_toggle_config_tooltip),
+        findsOneWidget,
+      );
+    });
+
+    testWidgets('tapping the toggle switches the active config path', (
+      WidgetTester tester,
+    ) async {
+      await pumpProfile(tester);
+      final ProviderContainer container = ProviderScope.containerOf(
+        tester.element(find.byType(ProfilePage)),
+        listen: false,
+      );
+
+      final ProviderSubscription<String> sub = container.listen<String>(
+        activeConfigPathProvider,
+        (String? _, String _) {},
+      );
+      addTearDown(sub.close);
+      final String pathBefore = container.read(activeConfigPathProvider);
+
+      await tester.tap(find.byIcon(Icons.swap_horiz));
+      await tester.pump();
+
+      expect(container.read(activeConfigPathProvider), isNot(pathBefore));
     });
   });
 }

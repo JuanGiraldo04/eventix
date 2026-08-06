@@ -320,6 +320,12 @@ abstract class AppLocalizations {
   /// **'Sign out'**
   String get profile_logout;
 
+  /// No description provided for @profile_toggle_config_tooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'Switch configuration'**
+  String get profile_toggle_config_tooltip;
+
   /// No description provided for @reservations_title.
   ///
   /// In en, this message translates to:

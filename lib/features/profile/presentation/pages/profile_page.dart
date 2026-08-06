@@ -1,5 +1,9 @@
 import 'package:app_ui_kit/app_ui_kit.dart';
+import 'package:eventix/core/config/app_config.dart';
+import 'package:eventix/core/config/app_config_provider.dart';
+import 'package:eventix/core/config/config_icons.dart';
 import 'package:eventix/core/errors/failure.dart';
+import 'package:eventix/core/extensions/theme_extension.dart';
 import 'package:eventix/core/l10n/app_localizations.dart';
 import 'package:eventix/features/auth/domain/entities/app_user.dart';
 import 'package:eventix/features/auth/presentation/providers/current_user_provider.dart';
@@ -17,14 +21,36 @@ class ProfilePage extends ConsumerWidget {
     final AsyncValue<AppUser> asyncUser = ref.watch(currentUserProvider);
     final AsyncValue<void> asyncLogout = ref.watch(logoutProvider);
     final AppLocalizations l10n = AppLocalizations.of(context);
+    final AppConfig config = ref.watch(appConfigProvider).requireValue;
 
     return Scaffold(
-      appBar: AppBar(title: Text(l10n.profile_title)),
+      appBar: AppBar(
+        title: Text(l10n.profile_title),
+        actions: <Widget>[
+          Tooltip(
+            message: l10n.profile_toggle_config_tooltip,
+            child: AppCircleIconButton(
+              icon: Icons.swap_horiz,
+              backgroundColor: Colors.transparent,
+              iconColor: context.colorScheme.onSurface,
+              size: 24,
+              onTap: () => ref.read(activeConfigPathProvider.notifier).toggle(),
+            ),
+          ),
+        ],
+      ),
       body: Padding(
         padding: const EdgeInsets.all(AppSpacing.lg),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: <Widget>[
+            Center(
+              child: AppAvatar(
+                icon: iconByName(config.perfil.icono),
+                radius: 32,
+              ),
+            ),
+            const SizedBox(height: AppSpacing.md),
             AppProfileHeaderCard(
               isLoading: asyncUser.isLoading && !asyncUser.hasValue,
               errorMessage: asyncUser.hasError && !asyncUser.hasValue

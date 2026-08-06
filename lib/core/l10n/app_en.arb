@@ -36,6 +36,7 @@
     "nav_profile": "Profile",
     "profile_title": "Profile",
     "profile_logout": "Sign out",
+    "profile_toggle_config_tooltip": "Switch configuration",
     "reservations_title": "My reservations",
     "reservations_confirmed_section": "Confirmed",
     "reservations_pending_section": "Pending",

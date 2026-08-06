@@ -1,4 +1,6 @@
 import 'package:app_ui_kit/app_ui_kit.dart';
+import 'package:eventix/core/config/app_config.dart';
+import 'package:eventix/core/config/app_config_provider.dart';
 import 'package:eventix/core/errors/failure.dart';
 import 'package:eventix/core/l10n/app_localizations.dart';
 import 'package:eventix/features/events/presentation/utils/event_formatters.dart';
@@ -23,9 +25,10 @@ class CheckoutPage extends ConsumerWidget {
       checkoutProvider(reservationId),
     );
     final AppLocalizations l10n = AppLocalizations.of(context);
+    final AppConfig config = ref.watch(appConfigProvider).requireValue;
 
     return Scaffold(
-      appBar: AppBar(title: Text(l10n.checkout_title)),
+      appBar: AppBar(title: Text(config.checkout.titulo)),
       body: asyncCheckout.when(
         loading: () =>
             const Center(child: AppLoader(size: AppLoaderSize.large)),
@@ -40,6 +43,7 @@ class CheckoutPage extends ConsumerWidget {
           reservationId: reservationId,
           data: data,
           l10n: l10n,
+          config: config,
         ),
       ),
     );
@@ -51,11 +55,13 @@ class _CheckoutBody extends ConsumerWidget {
     required this.reservationId,
     required this.data,
     required this.l10n,
+    required this.config,
   });
 
   final String reservationId;
   final CheckoutData data;
   final AppLocalizations l10n;
+  final AppConfig config;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -97,7 +103,7 @@ class _CheckoutBody extends ConsumerWidget {
                 ),
                 const SizedBox(height: AppSpacing.sm),
                 AppStepper(
-                  label: l10n.checkout_quantity_label,
+                  label: config.checkout.cantidadLabel,
                   value: quantity,
                   onDecrement: quantity > 1
                       ? () => ref
@@ -116,14 +122,14 @@ class _CheckoutBody extends ConsumerWidget {
                 ),
                 const SizedBox(height: AppSpacing.md),
                 AppKeyValueRow(
-                  label: l10n.checkout_price_per_ticket,
+                  label: config.checkout.precioLabel,
                   value: formatEventPrecio(data.event.precio),
                 ),
                 const SizedBox(height: AppSpacing.lg),
                 AppCard(
                   variant: AppCardVariant.filled,
                   child: AppKeyValueRow(
-                    label: l10n.checkout_total_label,
+                    label: config.checkout.totalLabel,
                     value: formatEventPrecio(total),
                     emphasize: true,
                   ),
@@ -133,7 +139,7 @@ class _CheckoutBody extends ConsumerWidget {
           ),
         ),
         AppBottomActionBar(
-          buttonLabel: l10n.checkout_confirm,
+          buttonLabel: config.checkout.botonConfirmar,
           isLoading: asyncConfirm.isLoading,
           errorMessage: asyncConfirm.hasError
               ? switch (asyncConfirm.error) {

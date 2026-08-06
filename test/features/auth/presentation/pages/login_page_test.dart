@@ -36,7 +36,7 @@ void main() {
 
       expect(find.text(l10n.login_email_label), findsOneWidget);
       expect(find.text(l10n.login_password_label), findsOneWidget);
-      expect(find.text(l10n.login_submit), findsOneWidget);
+      expect(find.text(testAppConfig.auth.login.boton), findsOneWidget);
     });
 
     testWidgets(
@@ -60,16 +60,13 @@ void main() {
           ],
           child: const LoginPage(),
         );
-        final AppLocalizations l10n = AppLocalizations.of(
-          tester.element(find.byType(LoginPage)),
-        );
 
         await tester.enterText(
           find.byType(TextField).at(0),
           'juan@example.com',
         );
         await tester.enterText(find.byType(TextField).at(1), 'wrong');
-        await tester.tap(find.text(l10n.login_submit));
+        await tester.tap(find.text(testAppConfig.auth.login.boton));
         await tester.pumpAndSettle();
 
         expect(find.text('Correo o clave incorrectos'), findsOneWidget);
